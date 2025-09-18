@@ -1,0 +1,49 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: bank-db
+    environment:
+      POSTGRES_DB: bank
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pa$$w00rd
+      POSTGRES_INITDB_ARGS: "--auth-host=trust --auth-local=trust"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/BaseDatos.sql:/docker-entrypoint-initdb.d/01-init.sql
+    networks:
+      - bank_network
+    restart: unless-stopped
+
+  bank-app:
+    build: .
+    container_name: msa-banking-core
+    ports:
+      - "8080:8080"
+    networks:
+      - bank_network
+    depends_on:
+      postgres:
+        condition: service_started
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: bank-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@bank.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "8080:80"
+    networks:
+      - bank_network
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+
+networks:
+  bank_network:
+    driver: bridge

@@ -1,0 +1,15 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: msa-banking-core
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bank?currentSchema=bank
+    username: postgres
+    password: pa$$w00rd
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    show-sql: true
